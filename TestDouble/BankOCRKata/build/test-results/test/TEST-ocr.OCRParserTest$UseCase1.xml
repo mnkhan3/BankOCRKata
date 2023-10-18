@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="ocr.OCRParserTest$UseCase1" tests="2" skipped="0" failures="0" errors="0" timestamp="2023-10-18T13:29:33" hostname="Mohammeds-MacBook-Pro.local" time="0.003">
+  <properties/>
+  <testcase name="givenAValidInputParsesAccountNumbers()" classname="ocr.OCRParserTest$UseCase1" time="0.002"/>
+  <testcase name="IfFileIsNotFormattedThrowsIOException()" classname="ocr.OCRParserTest$UseCase1" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
