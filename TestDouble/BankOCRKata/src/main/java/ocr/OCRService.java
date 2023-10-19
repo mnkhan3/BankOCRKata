@@ -1,9 +1,6 @@
 package ocr;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +8,7 @@ import static java.text.MessageFormat.format;
 
 public class OCRService {
 
-    public static final int NUMBER_OF_ENTRIES = 4;
+    public static final int NUMBER_OF_LINE_ENTRIES = 4;
     public static final int NUMBER_OF_CHARACTERS_PER_LINE = 27;
 
     public void parseFile(String inputFilename, String outPutFileName) throws Exception {
@@ -29,14 +26,14 @@ public class OCRService {
                 throw new Exception(
                         format(
                                 "line {0} is not formatted correctly length must be {1}, but current length is {2}",
-                                lineNumber,
+                                lineNumber+1,
                                 NUMBER_OF_CHARACTERS_PER_LINE,
                                 lineSize)
                 );
             }
             entryLines.add(line);
 
-            if (entryLines.size() == NUMBER_OF_ENTRIES) {
+            if (entryLines.size() == NUMBER_OF_LINE_ENTRIES) {
                 String accountNumber = parseAccountNumber(entryLines);
                 accountNumbers.add(accountNumber);
                 entryLines.clear();
@@ -67,10 +64,14 @@ public class OCRService {
     }
 
     private void writeAccountNumbersToFile(List<String> accountNumbers, String outPutFileName) {
-        try (FileWriter writer = new FileWriter(outPutFileName)) {
+        try  {
+            FileWriter writer = new FileWriter(outPutFileName);
+            System.out.println(System.getProperty("user.dir"));
+            System.out.println(outPutFileName);
             for (String accountNumber : accountNumbers) {
                 writer.write(accountNumber + "\n");
             }
+            writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

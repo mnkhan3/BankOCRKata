@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class OCRServiceTest {
 
     private OCRService ocrParser;
-    private final String resourcePath = "/Users/mohammedkhan/workspace/TestDoubleOCR/src/test/resources/";
+    private final String resourcePath = "/Users/mohammedkhan/workspace/TestDouble/TestDouble/BankOCRKata/src/test/resources/";
 
     @BeforeEach
     void setUp() {
@@ -31,7 +31,7 @@ class OCRServiceTest {
                         "none");
             } catch (Exception e) {
                 assertEquals(
-                        "line 0 is not formatted correctly length must be 27, but current length is 25",
+                        "line 1 is not formatted correctly length must be 27, but current length is 25",
                         e.getMessage());
             }
         }
