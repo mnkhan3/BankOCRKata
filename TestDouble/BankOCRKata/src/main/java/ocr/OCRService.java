@@ -1,15 +1,51 @@
 package ocr;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Character.getNumericValue;
 import static java.text.MessageFormat.format;
 
 public class OCRService {
 
     public static final int NUMBER_OF_LINE_ENTRIES = 4;
     public static final int NUMBER_OF_CHARACTERS_PER_LINE = 27;
+
+
+    public void parseFileVerifyAccountNumber(String inputFilename, String outPutFileName) throws Exception {
+        BufferedReader reader = new BufferedReader(new FileReader((inputFilename)));
+        List<String> accountNumbers = new ArrayList<>();
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            if (verifyAccountNumber(line)) {
+                accountNumbers.add(line);
+            } else {
+                accountNumbers.add(line + " ERR");
+            }
+        }
+
+        writeAccountNumbersToFile(accountNumbers, outPutFileName);
+    }
+
+    public boolean verifyAccountNumber(String accountNumber) {
+        int digit;
+        int positionMultipliuer = accountNumber.length();
+        int sum = 0;
+
+        for (int i = 0; i < accountNumber.length(); i++) {
+            digit = getNumericValue(accountNumber.charAt(i));
+            sum += digit * positionMultipliuer;
+            positionMultipliuer--;
+        }
+
+        return sum % 11 == 0;
+    }
+
 
     public void parseFile(String inputFilename, String outPutFileName) throws Exception {
 
@@ -26,7 +62,7 @@ public class OCRService {
                 throw new Exception(
                         format(
                                 "line {0} is not formatted correctly length must be {1}, but current length is {2}",
-                                lineNumber+1,
+                                lineNumber + 1,
                                 NUMBER_OF_CHARACTERS_PER_LINE,
                                 lineSize)
                 );
@@ -64,10 +100,10 @@ public class OCRService {
     }
 
     private void writeAccountNumbersToFile(List<String> accountNumbers, String outPutFileName) {
-        try  {
+        try {
             FileWriter writer = new FileWriter(outPutFileName);
-            System.out.println(System.getProperty("user.dir"));
-            System.out.println(outPutFileName);
+//            System.out.println(System.getProperty("user.dir"));
+//            System.out.println(outPutFileName);
             for (String accountNumber : accountNumbers) {
                 writer.write(accountNumber + "\n");
             }
@@ -76,4 +112,5 @@ public class OCRService {
             e.printStackTrace();
         }
     }
+
 }

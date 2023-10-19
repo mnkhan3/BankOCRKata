@@ -8,16 +8,16 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class OCRServiceTest {
 
-    private OCRService ocrParser;
+    private OCRService ocrService;
     private final String resourcePath = "/Users/mohammedkhan/workspace/TestDouble/TestDouble/BankOCRKata/src/test/resources/";
 
     @BeforeEach
     void setUp() {
-        ocrParser = new OCRService();
+        ocrService = new OCRService();
     }
 
     @Nested
@@ -26,7 +26,7 @@ class OCRServiceTest {
         @Test
         void IfFileIsNotFormattedThrowsIOException() {
             try {
-                ocrParser.parseFile(
+                ocrService.parseFile(
                         resourcePath + "case1/useCaseInvalidInput.txt",
                         "none");
             } catch (Exception e) {
@@ -43,7 +43,7 @@ class OCRServiceTest {
             String outPutFileName = resourcePath + "case1/useCase1ActualOutput.txt";
             String expectedOutPutFile = resourcePath + "case1/useCase1ExpectedOutput.txt";
             
-            ocrParser.parseFile(inputFilename, outPutFileName);
+            ocrService.parseFile(inputFilename, outPutFileName);
 
             assertFilesMatch(expectedOutPutFile, outPutFileName);
         }
@@ -51,19 +51,27 @@ class OCRServiceTest {
 
     @Nested
     public class UseCase2 {
-
-        //Failing Tests
         @Test
-        void givenAValidInputWriteParsedAccountNumbersToFileAndIfTheyAreValidAccNum() throws Exception {
+        void givenAValidInputParsedAccountNumbersToFileAndIfTheyAreValidAccNum() throws Exception {
 
             String inputFilename = resourcePath + "case2/useCase2Input.txt";
             String outPutFileName = resourcePath + "case2/useCase2ActualOutput.txt";
             String expectedOutPutFile = resourcePath + "case2/useCase2ExpectedOutput.txt";
             
-            ocrParser.parseFile(inputFilename, outPutFileName);
+            ocrService.parseFileVerifyAccountNumber(inputFilename, outPutFileName);
 
             assertFilesMatch(expectedOutPutFile, outPutFileName);
         }
+    }
+
+    @Test
+    void givenAInvalidNumberVerifyAccountNumberShouldReturnFalse() {
+        assertFalse(ocrService.verifyAccountNumber("664371495"));
+    }  
+    
+    @Test
+    void givenAValidNumberVerifyAccountNumberShouldReturnTrue() {
+        assertTrue(ocrService.verifyAccountNumber("457508000"));
     }
 
     private void assertFilesMatch(String expectedFilePath, String actualFilePath) throws IOException {
