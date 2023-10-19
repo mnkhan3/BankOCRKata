@@ -10,7 +10,7 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class OCRParserTest {
+class OCRServiceTest {
 
     private OCRService ocrParser;
     private final String resourcePath = "/Users/mohammedkhan/workspace/TestDoubleOCR/src/test/resources/";
@@ -59,10 +59,8 @@ class OCRParserTest {
             String inputFilename = resourcePath + "case2/useCase2Input.txt";
             String outPutFileName = resourcePath + "case2/useCase2ActualOutput.txt";
             String expectedOutPutFile = resourcePath + "case2/useCase2ExpectedOutput.txt";
-            ocrParser.parseFile(
-                    inputFilename,
-                    outPutFileName
-            );
+            
+            ocrParser.parseFile(inputFilename, outPutFileName);
 
             assertFilesMatch(expectedOutPutFile, outPutFileName);
         }
