@@ -9,43 +9,30 @@ import java.util.List;
 
 import static java.lang.Character.getNumericValue;
 import static java.text.MessageFormat.format;
+import static ocr.OCRService.NumberStatus.*;
 
 public class OCRService {
 
-    public static final int NUMBER_OF_LINE_ENTRIES = 4;
-    public static final int NUMBER_OF_CHARACTERS_PER_LINE = 27;
-
+    private static final int NUMBER_OF_LINE_ENTRIES = 4;
+    private static final int NUMBER_OF_CHARACTERS_PER_LINE = 27;
+    private static final String ERR_MESSAGE = "line {0} is not formatted correctly length must be {1}, but current length is {2}";
 
     public void parseFileVerifyAccountNumber(String inputFilename, String outPutFileName) throws Exception {
-        BufferedReader reader = new BufferedReader(new FileReader((inputFilename)));
-        List<String> accountNumbers = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFilename))) {
+            List<String> accountNumbers = new ArrayList<>();
+            String line;
 
-        String line;
-        while ((line = reader.readLine()) != null) {
-            if (verifyAccountNumber(line)) {
-                accountNumbers.add(line);
-            } else {
-                accountNumbers.add(line + " ERR");
+            while ((line = reader.readLine()) != null) {
+                NumberStatus accountNumberStatus = verifyAccountNumber(line);
+                accountNumbers.add(
+                        accountNumberStatus == NumberStatus.SUCCESS 
+                                ? line 
+                                : String.format("%s %s", line, accountNumberStatus));
             }
+
+            writeAccountNumbersToFile(accountNumbers, outPutFileName);
         }
-
-        writeAccountNumbersToFile(accountNumbers, outPutFileName);
     }
-
-    public boolean verifyAccountNumber(String accountNumber) {
-        int digit;
-        int positionMultipliuer = accountNumber.length();
-        int sum = 0;
-
-        for (int i = 0; i < accountNumber.length(); i++) {
-            digit = getNumericValue(accountNumber.charAt(i));
-            sum += digit * positionMultipliuer;
-            positionMultipliuer--;
-        }
-
-        return sum % 11 == 0;
-    }
-
 
     public void parseFile(String inputFilename, String outPutFileName) throws Exception {
 
@@ -61,7 +48,7 @@ public class OCRService {
             if (lineSize != NUMBER_OF_CHARACTERS_PER_LINE) {
                 throw new Exception(
                         format(
-                                "line {0} is not formatted correctly length must be {1}, but current length is {2}",
+                                ERR_MESSAGE,
                                 lineNumber + 1,
                                 NUMBER_OF_CHARACTERS_PER_LINE,
                                 lineSize)
@@ -102,8 +89,6 @@ public class OCRService {
     private void writeAccountNumbersToFile(List<String> accountNumbers, String outPutFileName) {
         try {
             FileWriter writer = new FileWriter(outPutFileName);
-//            System.out.println(System.getProperty("user.dir"));
-//            System.out.println(outPutFileName);
             for (String accountNumber : accountNumbers) {
                 writer.write(accountNumber + "\n");
             }
@@ -111,6 +96,30 @@ public class OCRService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public NumberStatus verifyAccountNumber(String accountNumber) {
+        int digit;
+        int positionMultiplier = accountNumber.length();
+        int sum = 0;
+
+        for (int i = 0; i < accountNumber.length(); i++) {
+            int numericValue = getNumericValue(accountNumber.charAt(i));
+            if (numericValue == -1) {
+                return ILL;
+            }
+            digit = numericValue;
+            sum += digit * positionMultiplier;
+            positionMultiplier--;
+        }
+
+        return sum % 11 == 0 ? SUCCESS : ERR;
+    }
+
+    enum NumberStatus {
+        ERR,
+        ILL,
+        SUCCESS
     }
 
 }
